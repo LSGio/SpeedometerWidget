@@ -23,6 +23,7 @@ import java.util.List;
  * Speedometer with needle.
  * <p>
  * Created by danon on 26.02.14.
+ * Edited by LSGio on 30.03.22.
  *
  * @author Anton Danshin <a href="mailto:anton.danshin@frtk.ru">anton.danshin@frtk.ru</a>
  * @version 1.0
@@ -30,12 +31,13 @@ import java.util.List;
 public class SpeedometerGauge extends View {
 
     public static final double DEFAULT_MAX_SPEED = 100.0;
+    public static final double DEFAULT_MIN_SPEED = 0.0;
     public static final double DEFAULT_MAJOR_TICK_STEP = 20.0;
     public static final int DEFAULT_MINOR_TICKS = 1;
     public static final int DEFAULT_LABEL_TEXT_SIZE_DP = 10;
     public static final int DEFAULT_UNITS_TEXT_SIZE_DP = 20;
-    private static final String TAG = SpeedometerGauge.class.getSimpleName();
     private double maxSpeed = DEFAULT_MAX_SPEED;
+    private double minSpeed = DEFAULT_MIN_SPEED;
     private double speed = 0;
     private int defaultColor = Color.rgb(180, 180, 180);
     private double majorTickStep = DEFAULT_MAJOR_TICK_STEP;
@@ -81,9 +83,18 @@ public class SpeedometerGauge extends View {
     }
 
     public void setMaxSpeed(double maxSpeed) {
-        if (maxSpeed <= 0)
-            throw new IllegalArgumentException("Non-positive value specified as max speed.");
+//        if (maxSpeed <= 0)
+//            throw new IllegalArgumentException("Non-positive value specified as max speed.");
         this.maxSpeed = maxSpeed;
+        invalidate();
+    }
+
+    public double getMinSpeed() {
+        return minSpeed;
+    }
+
+    public void setMinSpeed(double minSpeed) {
+        this.minSpeed = minSpeed;
         invalidate();
     }
 
@@ -96,6 +107,8 @@ public class SpeedometerGauge extends View {
             throw new IllegalArgumentException("Non-positive value specified as a speed.");
         if (speed > maxSpeed)
             speed = maxSpeed;
+        if (speed < minSpeed)
+            speed = minSpeed;
         this.speed = speed;
         invalidate();
     }
@@ -111,11 +124,13 @@ public class SpeedometerGauge extends View {
 
     @TargetApi(11)
     public ValueAnimator setSpeed(double progress, long duration, long startDelay) {
-        if (progress < 0)
-            throw new IllegalArgumentException("Negative value specified as a speed.");
+//        if (progress < 0)
+//            throw new IllegalArgumentException("Negative value specified as a speed.");
 
         if (progress > maxSpeed)
             progress = maxSpeed;
+        if (progress < minSpeed)
+            progress = minSpeed;
 
         ValueAnimator va = ValueAnimator.ofObject(new TypeEvaluator<Double>() {
             @Override
@@ -437,7 +452,7 @@ public class SpeedometerGauge extends View {
     }
 
 
-    public static interface LabelConverter {
+    public interface LabelConverter {
 
         String getLabelFor(double progress, double maxProgress);
 
